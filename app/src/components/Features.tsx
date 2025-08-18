@@ -35,7 +35,7 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="bg-gray-900 py-20">
+    <section id="features" className="bg-gray-900 py-20">
       <div className="max-w-7xl mx-auto px-6 text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-12">
           Powerful Features for Smarter Healthcare

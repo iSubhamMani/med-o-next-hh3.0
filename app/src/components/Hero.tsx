@@ -12,6 +12,7 @@ import { Users, Heart } from "lucide-react";
 const HeroSection = () => {
   return (
     <section
+      id="hero"
       className="relative h-screen bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `url('/hero.png')`,
@@ -27,13 +28,13 @@ const HeroSection = () => {
         </div>
         <div className="hidden md:flex items-center space-x-8 text-white">
           <a
-            href="#"
+            href="#hero"
             className="hover:text-primary-foreground/80 transition-colors"
           >
             Home
           </a>
           <a
-            href="#"
+            href="#features"
             className="hover:text-primary-foreground/80 transition-colors"
           >
             Features
