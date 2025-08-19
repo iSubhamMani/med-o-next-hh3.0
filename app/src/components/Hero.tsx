@@ -1,13 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "./ui/button";
-import { Users, Heart } from "lucide-react";
+import SignupModal from "./SignupModal";
 
 const HeroSection = () => {
   return (
@@ -89,66 +80,7 @@ const HeroSection = () => {
             care.
           </p>
           <div className="fade-in-up-delay-2 flex justify-center">
-            <Dialog>
-              <DialogTrigger asChild>
-                <button className="cursor-pointer bg-gray-900 text-white px-6 py-3 rounded-lg shadow-2xl hover:bg-gray-800 flex items-center space-x-2 transition">
-                  <span>Get Started</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              </DialogTrigger>
-              <DialogContent className="bg-gray-900/70 backdrop-blur-xl max-w-md mx-auto p-6 rounded-lg shadow-lg border border-white/20">
-                <DialogHeader>
-                  <DialogTitle className="text-white font-bold">
-                    Choose Your Role
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-200">
-                    Select your role to get started with Med-o-Next
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col space-y-4">
-                  <Button className="text-lg border border-white bg-transparent text-white px-4 py-6 cursor-pointer rounded transition">
-                    <Heart className="inline-block mr-2" />
-                    Patient
-                  </Button>
-                  <Button className="text-lg border border-white bg-transparent text-white px-4 py-6 cursor-pointer rounded transition">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="inline-block mr-2"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M6 3v6a6 6 0 0 0 12 0V3" />
-                      <path d="M8 15v2a4 4 0 0 0 8 0v-2" />
-                      <circle cx="20" cy="10" r="2" />
-                    </svg>
-                    Healthcare Provider
-                  </Button>
-                  <Button className="text-lg border border-white bg-transparent text-white px-4 py-6 cursor-pointer rounded transition">
-                    <Users className="inline-block mr-2" />
-                    NGO
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <SignupModal />
           </div>
         </div>
       </div>
