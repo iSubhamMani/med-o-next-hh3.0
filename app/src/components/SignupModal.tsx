@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface GeneralDetails {
   name: string;
@@ -40,7 +41,7 @@ interface RoleSpecificFields {
   professional_license_id?: string;
   specialization?: string;
   associatedOrganization?: string;
-  yearsOfExperience?: number;
+  yearsOfExperience?: string;
   organizationName?: string;
   areaOfFocus?: string;
 }
@@ -80,7 +81,7 @@ export default function RegistrationModal() {
           professional_license_id: "",
           specialization: "",
           associatedOrganization: "",
-          yearsOfExperience: 0,
+          yearsOfExperience: "",
           prefferedLang: "",
         });
         break;
@@ -137,14 +138,27 @@ export default function RegistrationModal() {
       fd.append(key, value !== undefined ? String(value) : "");
     }
 
-    for (const [key, value] of fd.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
     try {
       const res = await axios.post("/api/user", fd);
 
-      console.log(res.data);
+      if (res.status === 201) {
+        toast.success("Registration successful!");
+        setFormData({
+          name: "",
+          email: "",
+          phone_number: "",
+          password: "",
+          role: "",
+          address: {
+            street: "",
+            city: "",
+            state: "",
+            pinCode: "",
+          },
+        });
+        setRoleSpecificFields({});
+        setStep(1);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -210,6 +224,48 @@ export default function RegistrationModal() {
                   value={roleSpecificFields.specialization}
                   onChange={handleRoleSpecificChange}
                   placeholder="e.g., Cardiology"
+                />
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="preferredLanguage">Preferred Language</Label>
+                <Select
+                  value={roleSpecificFields.prefferedLang}
+                  onValueChange={(value) =>
+                    handleSelectChange("prefferedLang", value)
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="english">English</SelectItem>
+                    <SelectItem value="hindi">Hindi</SelectItem>
+                    <SelectItem value="bengali">Bengali</SelectItem>
+                    <SelectItem value="marathi">Marathi</SelectItem>
+                    <SelectItem value="telugu">Telugu</SelectItem>
+                    <SelectItem value="tamil">Tamil</SelectItem>
+                    <SelectItem value="gujarati">Gujarati</SelectItem>
+                    <SelectItem value="urdu">Urdu</SelectItem>
+                    <SelectItem value="kannada">Kannada</SelectItem>
+                    <SelectItem value="odia">Odia</SelectItem>
+                    <SelectItem value="malayalam">Malayalam</SelectItem>
+                    <SelectItem value="punjabi">Punjabi</SelectItem>
+                    <SelectItem value="assamese">Assamese</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Label className="w-full" htmlFor="yearsOfExperience">
+                  Experience (in years)
+                </Label>
+                <Input
+                  id="yearsOfExperience"
+                  name="yearsOfExperience"
+                  type="number"
+                  value={roleSpecificFields.yearsOfExperience || ""}
+                  onChange={handleRoleSpecificChange}
+                  placeholder="e.g., 5"
+                  required
                 />
               </div>
             </div>
