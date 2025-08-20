@@ -1,3 +1,4 @@
+import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
 
 const HeroSection = () => {
@@ -73,7 +74,7 @@ const HeroSection = () => {
           </h1>
           <p
             style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.6)" }}
-            className="text-white text-xl md:text-2xl mb-12 opacity-90 fade-in-up-delay-1 max-w-2xl mx-auto leading-relaxed"
+            className="bg-emerald-600/60 rounded-md p-4 shadow-xl text-white text-xl md:text-2xl mb-12 opacity-90 fade-in-up-delay-1 max-w-2xl mx-auto leading-relaxed"
           >
             Unifying patients, healthcare providers, and caregivers in a single,
             intuitive system designed to simplify the complexities of modern
@@ -81,23 +82,7 @@ const HeroSection = () => {
           </p>
           <div className="fade-in-up-delay-2 flex gap-6 justify-center">
             <SignupModal />
-            <button className="cursor-pointer bg-green-900 text-green-200 px-6 py-3 rounded-lg shadow-2xl hover:bg-green-700 flex items-center space-x-2 transition">
-              <span>Login</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
+            <LoginModal />
           </div>
         </div>
       </div>

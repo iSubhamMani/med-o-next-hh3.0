@@ -21,6 +21,7 @@ import {
 } from "./ui/dialog";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { LoaderCircle } from "lucide-react";
 
 interface GeneralDetails {
   name: string;
@@ -63,6 +64,7 @@ export default function RegistrationModal() {
       pinCode: "",
     },
   });
+  const [submitting, setSubmitting] = useState(false);
 
   // State for role-specific fields
   const [roleSpecificFields, setRoleSpecificFields] =
@@ -138,6 +140,8 @@ export default function RegistrationModal() {
       fd.append(key, value !== undefined ? String(value) : "");
     }
 
+    setSubmitting(true);
+
     try {
       const res = await axios.post("/api/user", fd);
 
@@ -161,6 +165,8 @@ export default function RegistrationModal() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -338,218 +344,215 @@ export default function RegistrationModal() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Register</DialogTitle>
-          <DialogDescription>
-            Please fill out the form to register as a new user.
-          </DialogDescription>
         </DialogHeader>
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
-            <div className="flex flex-col space-y-4">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold">
-                  Register as a New User
-                </h2>
-              </div>
-              <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-                {/* Step 1: General Details and Role Selection */}
-                {step === 1 && (
-                  <>
-                    <div className="flex flex-col space-y-2">
-                      <Label htmlFor="role">I am a...</Label>
-                      <Select
-                        value={formData.role}
-                        onValueChange={handleRoleChange}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="patient">Patient</SelectItem>
-                          <SelectItem value="healthcare_provider">
-                            Healthcare Provider
-                          </SelectItem>
-                          <SelectItem value="ngo">
-                            NGO Representative
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Jane Doe"
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <Label htmlFor="phone_number">Phone Number</Label>
-                      <Input
-                        id="phone_number"
-                        name="phone_number"
-                        type="tel"
-                        value={formData.phone_number}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 1234567890"
-                        required
-                      />
-                    </div>
-                    <div className="flex space-x-4">
-                      <div className="flex flex-col space-y-2">
-                        <Label htmlFor="street">Street</Label>
-                        <Input
-                          id="street"
-                          name="street"
-                          type="text"
-                          value={formData.address.street}
-                          onChange={(e) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              address: {
-                                ...prev.address,
-                                street: e.target.value,
-                              },
-                            }));
-                          }}
-                          placeholder="e.g., 123 Main St"
-                          required
-                        />
-                      </div>
-                      <div className="flex flex-col space-y-2">
-                        <Label htmlFor="city">City</Label>
-                        <Input
-                          id="city"
-                          name="city"
-                          type="text"
-                          value={formData.address.city}
-                          onChange={(e) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              address: {
-                                ...prev.address,
-                                city: e.target.value,
-                              },
-                            }));
-                          }}
-                          placeholder="e.g., Kolkata"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="flex space-x-4">
-                      <div className="flex flex-col space-y-2">
-                        <Label htmlFor="state">State</Label>
-                        <Input
-                          id="state"
-                          name="state"
-                          type="text"
-                          value={formData.address.state}
-                          onChange={(e) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              address: {
-                                ...prev.address,
-                                state: e.target.value,
-                              },
-                            }));
-                          }}
-                          placeholder="e.g., West Bengal"
-                          required
-                        />
-                      </div>
-                      <div className="flex flex-col space-y-2">
-                        <Label htmlFor="pincode">Pincode</Label>
-                        <Input
-                          id="pincode"
-                          name="pincode"
-                          type="number"
-                          value={formData.address.pinCode}
-                          onChange={(e) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              address: {
-                                ...prev.address,
-                                pinCode: e.target.value,
-                              },
-                            }));
-                          }}
-                          placeholder="e.g., 700001"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="e.g., janedoe@example.com"
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        placeholder="Min. 8 characters"
-                        required
-                      />
-                    </div>
-                    <div className="flex justify-end pt-4">
-                      <Button
-                        className="bg-green-900 hover:bg-green-800 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
-                        onClick={() => setStep(2)}
-                        disabled={!formData.role}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </>
-                )}
 
-                {/* Step 2: Role-Specific Details */}
-                {step === 2 && (
-                  <>
-                    {renderRoleFields()}
-                    <div className="flex justify-between pt-4">
+        <div className="relative w-full">
+          <div className="flex flex-col space-y-4">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold">Register as a New User</h2>
+            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+              {/* Step 1: General Details and Role Selection */}
+              {step === 1 && (
+                <>
+                  <div className="flex flex-col space-y-2">
+                    <Label htmlFor="role">I am a...</Label>
+                    <Select
+                      value={formData.role}
+                      onValueChange={handleRoleChange}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select Role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="patient">Patient</SelectItem>
+                        <SelectItem value="healthcare_provider">
+                          Healthcare Provider
+                        </SelectItem>
+                        <SelectItem value="ngo">NGO Representative</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="e.g., Jane Doe"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label htmlFor="phone_number">Phone Number</Label>
+                    <Input
+                      id="phone_number"
+                      name="phone_number"
+                      type="tel"
+                      value={formData.phone_number}
+                      onChange={handleInputChange}
+                      placeholder="e.g., 1234567890"
+                      required
+                    />
+                  </div>
+                  <div className="flex space-x-4">
+                    <div className="flex flex-col space-y-2">
+                      <Label htmlFor="street">Street</Label>
+                      <Input
+                        id="street"
+                        name="street"
+                        type="text"
+                        value={formData.address.street}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              street: e.target.value,
+                            },
+                          }));
+                        }}
+                        placeholder="e.g., 123 Main St"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label htmlFor="city">City</Label>
+                      <Input
+                        id="city"
+                        name="city"
+                        type="text"
+                        value={formData.address.city}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              city: e.target.value,
+                            },
+                          }));
+                        }}
+                        placeholder="e.g., Kolkata"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex space-x-4">
+                    <div className="flex flex-col space-y-2">
+                      <Label htmlFor="state">State</Label>
+                      <Input
+                        id="state"
+                        name="state"
+                        type="text"
+                        value={formData.address.state}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              state: e.target.value,
+                            },
+                          }));
+                        }}
+                        placeholder="e.g., West Bengal"
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                      <Label htmlFor="pincode">Pincode</Label>
+                      <Input
+                        id="pincode"
+                        name="pincode"
+                        type="number"
+                        value={formData.address.pinCode}
+                        onChange={(e) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            address: {
+                              ...prev.address,
+                              pinCode: e.target.value,
+                            },
+                          }));
+                        }}
+                        placeholder="e.g., 700001"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="e.g., janedoe@example.com"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Min. 8 characters"
+                      required
+                    />
+                  </div>
+                  <div className="flex justify-end pt-4">
+                    <Button
+                      className="bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
+                      onClick={() => setStep(2)}
+                      disabled={!formData.role}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {/* Step 2: Role-Specific Details */}
+              {step === 2 && (
+                <>
+                  {renderRoleFields()}
+                  <div className="flex justify-between pt-4">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="bg-gray-800 hover:bg-gray-800/80 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
+                      onClick={() => setStep(1)}
+                    >
+                      Back
+                    </Button>
+                    <div className="flex space-x-2">
                       <Button
                         type="button"
                         variant="secondary"
                         className="bg-gray-800 hover:bg-gray-800/80 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
-                        onClick={() => setStep(1)}
                       >
-                        Back
+                        Cancel
                       </Button>
-                      <div className="flex space-x-2">
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          className="bg-gray-800 hover:bg-gray-800/80 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          className="bg-green-900 hover:bg-green-800 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
-                          type="submit"
-                        >
-                          Register
-                        </Button>
-                      </div>
+                      <Button
+                        disabled={submitting}
+                        className="bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
+                        type="submit"
+                      >
+                        {submitting ? (
+                          <LoaderCircle className="animate-spin size-4" />
+                        ) : (
+                          "Register"
+                        )}
+                      </Button>
                     </div>
-                  </>
-                )}
-              </form>
-            </div>
+                  </div>
+                </>
+              )}
+            </form>
           </div>
         </div>
       </DialogContent>

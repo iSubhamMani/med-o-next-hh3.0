@@ -49,18 +49,20 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token._id = user._id?.toString();
+        token.role = user.role?.toString();
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user._id = token._id;
+        session.user.role = token.role;
       }
       return session;
     },
   },
   pages: {
-    signIn: "/signin",
+    signIn: "/",
   },
   session: {
     strategy: "jwt",
