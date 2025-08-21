@@ -57,7 +57,7 @@ const LoginModal = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="cursor-pointer bg-emerald-900 text-emerald-200 px-6 py-3 rounded-lg shadow-2xl hover:bg-emerald-700 flex items-center space-x-2 transition">
+        <button className="font-bold cursor-pointer bg-gradient-to-t from-emerald-900 to-emerald-600 text-white px-6 py-3 rounded-lg shadow-2xl hover:from-emerald-900 hover:to-emerald-700 flex items-center space-x-2 transition">
           <span>Login</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"

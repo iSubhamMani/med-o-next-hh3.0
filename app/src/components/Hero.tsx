@@ -65,24 +65,33 @@ const HeroSection = () => {
 
       {/* Hero Content */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <div className="text-center max-w-4xl mx-auto px-6">
+        <div className="text-center max-w-5xl mx-auto px-6">
+          {/* Heading */}
           <h1
-            style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.6)" }}
-            className=" text-white text-5xl md:text-7xl font-bold mb-6 fade-in-up"
+            style={{ textShadow: "0 4px 16px rgba(0,0,0,0.7)" }}
+            className="text-white text-5xl md:text-7xl font-extrabold mb-8 tracking-tight fade-in-up"
           >
-            Empowering Patients. Enhancing Care.
+            Empowering <span className="text-emerald-400">Patients</span>.{" "}
+            <br />
+            Enhancing <span className="text-emerald-400">Care</span>.
           </h1>
+
+          {/* Subtext */}
           <p
-            style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.6)" }}
-            className="bg-emerald-600/60 rounded-md p-4 shadow-xl text-white text-xl md:text-2xl mb-12 opacity-90 fade-in-up-delay-1 max-w-2xl mx-auto leading-relaxed"
+            style={{ backdropFilter: "blur(16px)" }}
+            className="bg-white/10 rounded-2xl px-6 py-5 shadow-2xl text-white text-lg md:text-2xl mb-12 opacity-95 fade-in-up-delay-1 max-w-2xl mx-auto leading-relaxed"
           >
-            Unifying patients, healthcare providers, and caregivers in a single,
-            intuitive system designed to simplify the complexities of modern
-            care.
+            Unifying patients, healthcare providers, and caregivers in a{" "}
+            <span className="font-semibold text-emerald-200">
+              single, intuitive system
+            </span>{" "}
+            designed to simplify the complexities of modern care.
           </p>
-          <div className="fade-in-up-delay-2 flex gap-6 justify-center">
-            <SignupModal />
+
+          {/* Buttons */}
+          <div className="fade-in-up-delay-2 flex flex-wrap gap-6 justify-center">
             <LoginModal />
+            <SignupModal />
           </div>
         </div>
       </div>

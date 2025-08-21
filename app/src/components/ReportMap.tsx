@@ -44,54 +44,49 @@ export default function ReportsMap({ reports }: { reports: Report[] }) {
         />
 
         {/* Reports Markers */}
-        {reports.map(
-          (report) => (
-            console.log(report),
-            (
-              <Marker
-                key={report._id}
-                position={[
-                  report.location.coordinates[1],
-                  report.location.coordinates[0],
-                ]}
-              >
-                {/* Tooltip on Hover */}
-                <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-                  <span>
-                    <b>{report.title}</b> <br />
-                    Reported by {report.reportedBy}
-                  </span>
-                </Tooltip>
+        {reports.map((report) => (
+          <Marker
+            key={report._id}
+            position={[
+              report.location.coordinates[1],
+              report.location.coordinates[0],
+            ]}
+          >
+            {/* Tooltip on Hover */}
+            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+              <span>
+                <b>{report.title}</b> <br />
+                Reported by {report.reportedBy}
+              </span>
+            </Tooltip>
 
-                {/* Popup on Click */}
-                <Popup>
-                  <div>
-                    <h3 className="font-semibold">{report.title}</h3>
-                    <p>{report.details}</p>
-                    <p className="text-sm text-gray-500">
-                      Type:{" "}
-                      <span className="text-gray-800">
-                        {report.reportType === "illness"
-                          ? "Illness"
-                          : report.reportType === "outbreak"
-                          ? "Outbreak"
-                          : "Mental Health Crisis"}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Reported by:{" "}
-                      <span className="text-gray-800">{report.reportedBy}</span>
-                    </p>
-                    <small>
-                      Lat: {report.location.coordinates[1]}, Lng:{" "}
-                      {report.location.coordinates[0]}
-                    </small>
-                  </div>
-                </Popup>
-              </Marker>
-            )
-          )
-        )}
+            {/* Popup on Click */}
+            <Popup>
+              <div>
+                <h3 className="font-semibold">{report.title}</h3>
+                <p>{report.details}</p>
+                <p className="text-sm text-gray-500">
+                  Type:{" "}
+                  <span className="text-gray-800">
+                    {report.reportType === "illness"
+                      ? "Illness"
+                      : report.reportType === "outbreak"
+                      ? "Outbreak"
+                      : "Mental Health Crisis"}
+                  </span>
+                </p>
+                <p className="text-sm text-gray-500">
+                  Reported by:{" "}
+                  <span className="text-gray-800">{report.reportedBy}</span>
+                </p>
+                <small>
+                  Lat: {report.location.coordinates[1]}, Lng:{" "}
+                  {report.location.coordinates[0]}
+                </small>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
     </div>
   );

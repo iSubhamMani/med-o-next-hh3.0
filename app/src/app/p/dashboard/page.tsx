@@ -1,9 +1,10 @@
-import { Menu, User, Bell } from "lucide-react";
+import { User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PatientDashboardFeatures from "@/components/PatientDashboardFeatures";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/config";
 import { fetchPatientDetails } from "@/utils/fetchPatientDetails";
+import LogoutButton from "@/components/LogoutButton";
 
 const PatientDashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -38,6 +39,7 @@ const PatientDashboard = async () => {
               <Button variant="ghost" size="icon">
                 <Bell className="h-5 w-5 text-neutral-600" />
               </Button>
+              <LogoutButton />
             </nav>
           </div>
         </header>
