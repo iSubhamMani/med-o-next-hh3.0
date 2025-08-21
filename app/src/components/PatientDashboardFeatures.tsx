@@ -116,8 +116,8 @@ const PatientDashboardFeatures = () => {
           title="Med-o-Report"
           description="Report health cases & outbreaks"
           icon={<FileText />}
-          buttonText="View All Reports"
-          onButtonClick={() => console.log("View all reports clicked")}
+          buttonText="Report Now"
+          onButtonClick={() => router.push("/p/report")}
           className="md:col-span-2 lg:col-span-1"
         >
           <div>
