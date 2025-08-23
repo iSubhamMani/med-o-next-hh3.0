@@ -29,25 +29,32 @@ interface Location {
 }
 interface MapComponentProps {
   initialPosition: Location;
-  onLocationChange: (location: Location) => void;
+  onLocationChange?: (location: Location) => void;
+  draggable?: boolean;
 }
 
 function LocationMarker({
   position,
   setPosition,
   onLocationChange,
+  draggable,
 }: {
   position: Location;
   setPosition: (pos: Location) => void;
   onLocationChange: (pos: Location) => void;
+  draggable?: boolean;
 }) {
-  const map = useMapEvents({
-    click(e) {
-      const newPos = { lat: e.latlng.lat, lng: e.latlng.lng };
-      setPosition(newPos);
-      onLocationChange(newPos);
-    },
-  });
+  const map = useMapEvents(
+    draggable
+      ? {
+          click(e) {
+            const newPos = { lat: e.latlng.lat, lng: e.latlng.lng };
+            setPosition(newPos);
+            onLocationChange(newPos);
+          },
+        }
+      : {}
+  );
 
   useEffect(() => {
     if (position.lat !== 0 && position.lng !== 0) {
@@ -65,6 +72,7 @@ function LocationMarker({
 export default function MapComponent({
   initialPosition,
   onLocationChange,
+  draggable = true,
 }: MapComponentProps) {
   const [position, setPosition] = useState<Location>(initialPosition);
 
@@ -85,9 +93,10 @@ export default function MapComponent({
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
       />
       <LocationMarker
+        draggable={draggable}
         position={position}
         setPosition={setPosition}
-        onLocationChange={onLocationChange}
+        onLocationChange={onLocationChange ?? (() => {})}
       />
     </MapContainer>
   );

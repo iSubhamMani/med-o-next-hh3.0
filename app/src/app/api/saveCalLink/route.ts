@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/config";
-import Report from "@/models/Report";
+import { HealthcareProviderModel } from "@/models/HealthcareProvider";
 
 export async function POST(req: NextRequest) {
   await connectDB();
@@ -14,32 +14,26 @@ export async function POST(req: NextRequest) {
       throw new Error("Unauthorized user");
     }
 
-    const formData = await req.formData();
-    const reportType = formData.get("reportType")?.toString();
-    const details = formData.get("details")?.toString();
-    const location = formData.get("location")?.toString();
-    const title = formData.get("title")?.toString();
+    console.log(user._id);
 
-    if (!reportType || !details || !location || !title) {
+    const formData = await req.formData();
+    const calLink = formData.get("calLink")?.toString();
+
+    if (!calLink) {
       throw new Error("Missing required fields");
     }
 
-    await Report.create({
-      title,
-      reportType,
-      details,
-      reportedBy: user._id,
-      location: {
-        type: "Point",
-        coordinates: location
-          .split(",")
-          .map((coord) => parseFloat(coord.trim())),
-      },
-    });
+    const provider = await HealthcareProviderModel.findOneAndUpdate(
+      { user: user._id },
+      { $set: { calLink } },
+      { new: true }
+    );
+
+    console.log(provider);
 
     return NextResponse.json(
       {
-        message: "Report submitted successfully",
+        message: "Link Updated",
         success: true,
       },
       {
@@ -75,44 +69,28 @@ export async function GET() {
   await connectDB();
 
   try {
-    const reports = await Report.aggregate([
-      {
-        $lookup: {
-          from: "users",
-          localField: "reportedBy",
-          foreignField: "_id",
-          as: "reportedByUser",
-        },
-      },
-      {
-        $lookup: {
-          from: "ngos",
-          localField: "reportedBy",
-          foreignField: "contactPerson",
-          as: "ngoDetails",
-        },
-      },
-      {
-        $unwind: "$reportedByUser",
-      },
+    const user = (await getServerSession(authOptions))?.user;
 
-      {
-        $project: {
-          _id: 1,
-          title: 1,
-          reportType: 1,
-          details: 1,
-          reportedBy: "$reportedByUser.fullname",
-          location: 1,
-          createdAt: 1,
-          ngoName: "$ngoDetails.organizationName",
-        },
-      },
-    ]);
+    if (!user) {
+      throw new Error("Unauthorized user");
+    }
 
-    return NextResponse.json(reports, {
-      status: 200,
+    const provider = await HealthcareProviderModel.findOne({
+      user: user._id,
     });
+
+    console.log(provider);
+
+    return NextResponse.json(
+      {
+        message: "Link fetched",
+        success: true,
+        link: provider?.calLink || "",
+      },
+      {
+        status: 200,
+      }
+    );
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json(

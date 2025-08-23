@@ -4,7 +4,7 @@ import axios from "axios";
 import React, { useCallback, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Download, LoaderCircle } from "lucide-react";
+import { ArrowLeft, Download, Languages, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,8 +43,14 @@ const Coach = () => {
     weight: "",
     disease: "",
   });
-  const [result, setResult] = useState<HealthRecommendationContent>();
+  const [result, setResult] = useState<HealthRecommendationContent | null>(
+    null
+  );
   const ref = useRef<HTMLDivElement>(null);
+  const [translatedResult, setTranslatedResult] =
+    useState<HealthRecommendationContent | null>(null);
+  const [toggleTranslateContent, setToggleTranslateContent] =
+    useState<boolean>(false);
 
   const downloadRecommendation = useCallback(() => {
     if (ref.current === null) {
@@ -94,6 +100,38 @@ const Coach = () => {
     }
   };
 
+  const translate = async () => {
+    try {
+      if (!result) return;
+
+      setLoading(true);
+
+      const fd = new FormData();
+      fd.append("content", JSON.stringify(result));
+      const res = await axios.post("/api/translate", fd);
+
+      if (res.data) {
+        if (res.data.content.error) {
+          setTranslatedResult(res.data.content);
+          setToggleTranslateContent(true);
+          return;
+        }
+        setTranslatedResult(res.data.content);
+        setToggleTranslateContent(true);
+      } else {
+        setTranslatedResult(null);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleTranslation = () => {
+    setToggleTranslateContent(!toggleTranslateContent);
+  };
+
   return (
     <div className="min-h-screen py-8 px-6">
       <div className="mb-8">
@@ -115,6 +153,43 @@ const Coach = () => {
           </p>
         </div>
       </div>
+      {result && (
+        <div className="flex gap-2 items-center justify-center">
+          {result && !translatedResult && (
+            <button
+              onClick={translate}
+              className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
+            >
+              <span>
+                {loading ? (
+                  <LoaderCircle className="animate-spin size-4" />
+                ) : (
+                  "Translate"
+                )}
+              </span>
+              <Languages className="size-4" />
+            </button>
+          )}
+          {result && translatedResult && (
+            <button
+              onClick={toggleTranslation}
+              className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
+            >
+              <span>Toggle</span>
+              <Languages className="size-4" />
+            </button>
+          )}
+          {result && (
+            <button
+              onClick={downloadRecommendation}
+              className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
+            >
+              <span>Download Recommendation</span>
+              <Download className="size-4" />
+            </button>
+          )}
+        </div>
+      )}
       {!result && (
         <form className="mt-12 max-w-lg mx-auto w-full space-y-6 flex flex-col items-center">
           <Input
@@ -200,17 +275,8 @@ const Coach = () => {
           </div>
         </form>
       )}
-      {result && (
+      {result && !toggleTranslateContent && (
         <div className="w-full max-w-3xl mx-auto my-6">
-          <div className="my-6 flex justify-center">
-            <button
-              onClick={downloadRecommendation}
-              className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
-            >
-              <span>Download Recommendation</span>
-              <Download className="size-4" />
-            </button>
-          </div>
           <div ref={ref}>
             <Card className="p-6">
               <CardTitle className="text-2xl text-neutral-500 font-bold">
@@ -240,6 +306,42 @@ const Coach = () => {
               </div>
               <div className="my-2">
                 <p className="text-red-500">* {result.note}</p>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+      {translatedResult && toggleTranslateContent && (
+        <div className="w-full max-w-3xl mx-auto my-6">
+          <div ref={ref}>
+            <Card className="p-6">
+              <CardTitle className="text-2xl text-neutral-500 font-bold">
+                {translatedResult.title}
+              </CardTitle>
+              <CardDescription className="text-neutral-600 text-base">
+                {translatedResult.introduction}
+              </CardDescription>
+              <div>
+                {translatedResult.sections.map((section, index) => (
+                  <div key={index} className="my-4">
+                    <h1 className="text-xl font-bold bg-green-200 text-green-800 px-4 w-max rounded-sm">
+                      {section.title}
+                    </h1>
+                    {section.items.map((item, index) => (
+                      <div key={index} className="my-4">
+                        <h2 className="text-lg font-semibold text-emerald-700 underline underline-offset-4">
+                          {item.subtitle}
+                        </h2>
+                        <p className="text-neutral-600 text-base mt-2">
+                          {item.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="my-2">
+                <p className="text-red-500">* {translatedResult.note}</p>
               </div>
             </Card>
           </div>

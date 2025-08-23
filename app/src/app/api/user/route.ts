@@ -95,6 +95,7 @@ export async function POST(req: NextRequest) {
           associatedOrganization: associatedOrganization,
           yearsOfExperience: yearsOfExperience,
           prefferedLang: prefferedLang,
+          calLink: "",
         });
         break;
       case "ngo":

@@ -10,6 +10,7 @@ import {
   FileImage,
   X,
   Download,
+  Languages,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,17 +19,21 @@ import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { toPng } from "html-to-image";
 
+type AnalysisType = "prescription" | "medicalDoc";
+
 interface AnalysisResult {
-  title: string;
-  error: boolean;
-  errorMessage: string;
-  medicines: {
-    name: string;
-    details: {
-      uses: string;
-      sideEffects: string[];
-      safetyAdvice: string;
-    };
+  title?: string;
+  error?: boolean;
+  errorMessage?: string;
+  sections: {
+    title: string;
+    items: {
+      medicineName: string;
+      details: {
+        title: string;
+        content: string | string[];
+      }[];
+    }[];
   }[];
 }
 
@@ -37,9 +42,16 @@ const MedLens = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
     null
   );
+  const [translatedResult, setTranslatedResult] =
+    useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string>("");
+  const [isError, setIsError] = useState(false);
+  const [toggleTranslateContent, setToggleTranslateContent] =
+    useState<boolean>(false);
+  const [analysisType, setAnalysisType] =
+    useState<AnalysisType>("prescription"); // NEW
 
   const downloadPrescription = useCallback(() => {
     if (ref.current === null) {
@@ -58,9 +70,11 @@ const MedLens = () => {
       });
   }, [ref]);
 
-  const analyzeImage = async () => {
+  const analyzePrescription = async () => {
     if (!selectedImage) return;
 
+    setError("");
+    setIsError(false);
     setIsAnalyzing(true);
 
     const fd = new FormData();
@@ -70,6 +84,12 @@ const MedLens = () => {
       const res = await axios.post("/api/lens", fd);
 
       if (res.data) {
+        if (res.data.content.error) {
+          setIsError(true);
+          setError(res.data.content.errorMessage);
+          setAnalysisResult(res.data.content);
+          return;
+        }
         setAnalysisResult(res.data.content);
       } else {
         setAnalysisResult(null);
@@ -82,6 +102,87 @@ const MedLens = () => {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const translatePrescription = async () => {
+    try {
+      if (isError) return;
+
+      if (!analysisResult) return;
+
+      setIsAnalyzing(true);
+
+      const fd = new FormData();
+      fd.append("content", JSON.stringify(analysisResult));
+      const res = await axios.post("/api/translate", fd);
+
+      if (res.data) {
+        if (res.data.content.error) {
+          setIsError(true);
+          setError(res.data.content.errorMessage);
+          setTranslatedResult(res.data.content);
+          setToggleTranslateContent(true);
+          return;
+        }
+        setTranslatedResult(res.data.content);
+        setToggleTranslateContent(true);
+      } else {
+        setTranslatedResult(null);
+      }
+    } catch (error) {
+      console.log(error);
+      setError(
+        "An error occurred while processing the image. Please try again later."
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const analyzeMedicalDoc = async () => {
+    if (!selectedImage) return;
+
+    setError("");
+    setIsError(false);
+    setIsAnalyzing(true);
+
+    const fd = new FormData();
+    fd.append("imgFile", selectedImage);
+
+    try {
+      const res = await axios.post("/api/medicalDoc", fd);
+
+      if (res.data) {
+        if (res.data.content.error) {
+          setIsError(true);
+          setError(res.data.content.errorMessage);
+          setAnalysisResult(res.data.content);
+          return;
+        }
+        setAnalysisResult(res.data.content);
+      } else {
+        setAnalysisResult(null);
+      }
+    } catch (error) {
+      console.log("Error analyzing image:", error);
+      setError(
+        "An error occurred while processing the image. Please try again later."
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleAnalyze = () => {
+    if (analysisType === "prescription") {
+      analyzePrescription();
+    } else {
+      analyzeMedicalDoc();
+    }
+  };
+
+  const toggleTranslation = () => {
+    setToggleTranslateContent(!toggleTranslateContent);
   };
 
   return (
@@ -114,15 +215,37 @@ const MedLens = () => {
           <CardHeader>
             <CardTitle className="text-foreground flex items-center gap-2">
               <Camera className="w-5 h-5" />
-              Upload Prescription
+              Upload File
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Analysis Type Selection */}
+            <div className="flex gap-4 items-center justify-center">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="prescription"
+                  checked={analysisType === "prescription"}
+                  onChange={() => setAnalysisType("prescription")}
+                />
+                <span>Prescription</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="medicalDoc"
+                  checked={analysisType === "medicalDoc"}
+                  onChange={() => setAnalysisType("medicalDoc")}
+                />
+                <span>Medical Document</span>
+              </label>
+            </div>
+
             {/* Upload Area */}
             <div className="flex flex-col items-center border-2 border-dashed border-glass-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
               <Input
                 type="file"
-                accept="image/*"
+                accept="*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
@@ -139,10 +262,13 @@ const MedLens = () => {
                   </div>
                   <div>
                     <p className="text-foreground font-medium">
-                      Click to upload prescription
+                      Click to upload{" "}
+                      {analysisType === "prescription"
+                        ? "prescription"
+                        : "medical document"}
                     </p>
                     <p className="text-muted-foreground text-sm">
-                      PNG, JPG up to 10MB
+                      (Supported formats: JPG, PNG, PDF)
                     </p>
                   </div>
                 </div>
@@ -150,14 +276,14 @@ const MedLens = () => {
             </div>
 
             {/* Image Preview */}
-            {selectedImage && (
+            {selectedImage && analysisType !== "medicalDoc" && (
               <div className="space-y-4">
                 <div className="relative">
                   <Image
                     src={URL.createObjectURL(selectedImage)}
                     width={500}
                     height={500}
-                    alt="Prescription preview"
+                    alt="Preview"
                     className="w-full max-h-64 object-contain rounded-lg border border-glass-border"
                   />
                   <button
@@ -167,26 +293,28 @@ const MedLens = () => {
                     <X className="size-4" />
                   </button>
                 </div>
-
-                <Button
-                  onClick={analyzeImage}
-                  disabled={isAnalyzing}
-                  className="w-full bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <FileImage className="w-4 h-4 mr-2" />
-                      Analyze Prescription
-                    </>
-                  )}
-                </Button>
               </div>
             )}
+            <Button
+              onClick={handleAnalyze}
+              disabled={isAnalyzing || !selectedImage}
+              className="w-full bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-6 py-3 rounded-lg shadow-lg transition"
+            >
+              {isAnalyzing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <FileImage className="w-4 h-4 mr-2" />
+                  Analyze{" "}
+                  {analysisType === "prescription"
+                    ? "Prescription"
+                    : "Medical Document"}
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
 
@@ -197,15 +325,39 @@ const MedLens = () => {
           <CardHeader>
             <CardTitle className="text-foreground flex justify-between items-center gap-2">
               <span>Analysis Results</span>
-              {analysisResult && !analysisResult.error && (
-                <button
-                  onClick={downloadPrescription}
-                  className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
-                >
-                  <span>Download Summary</span>
-                  <Download className="size-4" />
-                </button>
-              )}
+              <div className="flex gap-2 items-center">
+                {analysisResult &&
+                  !analysisResult.error &&
+                  !translatedResult && (
+                    <button
+                      onClick={translatePrescription}
+                      className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
+                    >
+                      <span>Translate</span>
+                      <Languages className="size-4" />
+                    </button>
+                  )}
+                {analysisResult &&
+                  !analysisResult.error &&
+                  translatedResult && (
+                    <button
+                      onClick={toggleTranslation}
+                      className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
+                    >
+                      <span>Toggle</span>
+                      <Languages className="size-4" />
+                    </button>
+                  )}
+                {analysisResult && !analysisResult.error && (
+                  <button
+                    onClick={downloadPrescription}
+                    className="flex items-center gap-2 text-xs bg-emerald-900 hover:bg-emerald-800 text-white cursor-pointer px-4 py-2 rounded-lg shadow-lg transition"
+                  >
+                    <span>Download Summary</span>
+                    <Download className="size-4" />
+                  </button>
+                )}
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -232,61 +384,141 @@ const MedLens = () => {
               </div>
             )}
 
-            {analysisResult && (
+            {analysisResult && !isAnalyzing && !toggleTranslateContent && (
               <div className="my-6">
-                {analysisResult && (
+                {analysisResult.error ? (
+                  <p className="text-red-500 text-sm">
+                    {analysisResult.errorMessage}
+                  </p>
+                ) : (
                   <div className="max-w-3xl mx-auto w-full">
                     <div ref={ref} className="space-y-4">
-                      {analysisResult.medicines.map((medicine) => (
-                        <Card className="p-6" key={medicine.name}>
-                          <CardTitle>
-                            <p className="text-emerald-500 font-bold">
-                              {medicine.name}
-                            </p>
-                          </CardTitle>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <p className="text-neutral-500 font-semibold text-lg underline underline-offset-4">
-                                Uses:
-                              </p>
-                              <p>
-                                <span className="text-neutral-700">
-                                  {medicine.details.uses}
-                                </span>
-                              </p>
-                            </div>
-                            <div className="space-y-2">
-                              <p className="text-neutral-500 font-semibold text-lg underline underline-offset-4">
-                                Side Effects:
-                              </p>
-                              <ul className="">
-                                {medicine.details.sideEffects.map((effect) => (
-                                  <li
-                                    className="list-disc text-neutral-700 ml-6"
-                                    key={effect}
+                      {analysisResult.title && (
+                        <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                          {analysisResult.title}
+                        </h1>
+                      )}
+                      {analysisResult.sections.map((section, sectionIndex) => (
+                        <div
+                          key={section.title + sectionIndex}
+                          className="space-y-4"
+                        >
+                          <h2 className="text-2xl font-bold text-gray-800 underline underline-offset-4">
+                            {section.title}
+                          </h2>
+                          {section.items.map((item, itemIndex) => (
+                            <Card
+                              className="p-6"
+                              key={item.medicineName + itemIndex}
+                            >
+                              <CardTitle>
+                                <p className="text-emerald-500 font-bold">
+                                  {item.medicineName}
+                                </p>
+                              </CardTitle>
+                              <div className="space-y-4">
+                                {item.details.map((detail, detailIndex) => (
+                                  <div
+                                    className="space-y-2"
+                                    key={detail.title + detailIndex}
                                   >
-                                    {effect}
-                                  </li>
+                                    <p className="text-neutral-500 font-semibold text-lg underline underline-offset-4">
+                                      {detail.title}:
+                                    </p>
+                                    {Array.isArray(detail.content) ? (
+                                      <ul className="list-disc text-neutral-700 ml-6 space-y-1">
+                                        {detail.content.map(
+                                          (effect, effectIndex) => (
+                                            <li key={effectIndex}>{effect}</li>
+                                          )
+                                        )}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-neutral-700">
+                                        {detail.content}
+                                      </p>
+                                    )}
+                                  </div>
                                 ))}
-                              </ul>
-                            </div>
-                            <div className="space-y-2">
-                              <p className="text-neutral-500 font-semibold text-lg underline underline-offset-4">
-                                Safety Advice:
-                              </p>
-                              <p>
-                                <span className="text-neutral-700">
-                                  {medicine.details.safetyAdvice}
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
-                {error && <p className="text-red-500 text-sm">{error}</p>}
+              </div>
+            )}
+
+            {translatedResult && !isAnalyzing && toggleTranslateContent && (
+              <div className="my-6">
+                {translatedResult.error ? (
+                  <p className="text-red-500 text-sm">
+                    {translatedResult.errorMessage}
+                  </p>
+                ) : (
+                  <div className="max-w-3xl mx-auto w-full">
+                    <div ref={ref} className="space-y-4">
+                      {translatedResult.title && (
+                        <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                          {translatedResult.title}
+                        </h1>
+                      )}
+                      {translatedResult.sections.map(
+                        (section, sectionIndex) => (
+                          <div
+                            key={section.title + sectionIndex}
+                            className="space-y-4"
+                          >
+                            <h2 className="text-2xl font-bold text-gray-800 underline underline-offset-4">
+                              {section.title}
+                            </h2>
+                            {section.items.map((item, itemIndex) => (
+                              <Card
+                                className="p-6"
+                                key={item.medicineName + itemIndex}
+                              >
+                                <CardTitle>
+                                  <p className="text-emerald-500 font-bold">
+                                    {item.medicineName}
+                                  </p>
+                                </CardTitle>
+                                <div className="space-y-4">
+                                  {item.details.map((detail, detailIndex) => (
+                                    <div
+                                      className="space-y-2"
+                                      key={detail.title + detailIndex}
+                                    >
+                                      <p className="text-neutral-500 font-semibold text-lg underline underline-offset-4">
+                                        {detail.title}:
+                                      </p>
+                                      {Array.isArray(detail.content) ? (
+                                        <ul className="list-disc text-neutral-700 ml-6 space-y-1">
+                                          {detail.content.map(
+                                            (effect, effectIndex) => (
+                                              <li key={effectIndex}>
+                                                {effect}
+                                              </li>
+                                            )
+                                          )}
+                                        </ul>
+                                      ) : (
+                                        <p className="text-neutral-700">
+                                          {detail.content}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </Card>
+                            ))}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

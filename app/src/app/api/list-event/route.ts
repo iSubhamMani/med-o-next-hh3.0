@@ -2,7 +2,8 @@ import { connectDB } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/config";
-import Report from "@/models/Report";
+import Event from "@/models/Event";
+import mongoose from "mongoose";
 
 export async function POST(req: NextRequest) {
   await connectDB();
@@ -15,31 +16,31 @@ export async function POST(req: NextRequest) {
     }
 
     const formData = await req.formData();
-    const reportType = formData.get("reportType")?.toString();
-    const details = formData.get("details")?.toString();
+    const eventName = formData.get("name")?.toString();
+    const eventDate = formData.get("eventDate")?.toString();
     const location = formData.get("location")?.toString();
-    const title = formData.get("title")?.toString();
+    const lcoationDesc = formData.get("locationDesc")?.toString() || "";
 
-    if (!reportType || !details || !location || !title) {
+    if (!eventName || !eventDate || !location || !lcoationDesc) {
       throw new Error("Missing required fields");
     }
 
-    await Report.create({
-      title,
-      reportType,
-      details,
-      reportedBy: user._id,
+    await Event.create({
+      name: eventName,
+      eventDate,
+      listedBy: user._id,
       location: {
         type: "Point",
         coordinates: location
           .split(",")
           .map((coord) => parseFloat(coord.trim())),
       },
+      locationDesc: lcoationDesc,
     });
 
     return NextResponse.json(
       {
-        message: "Report submitted successfully",
+        message: "Event listed successfully",
         success: true,
       },
       {
@@ -75,42 +76,40 @@ export async function GET() {
   await connectDB();
 
   try {
-    const reports = await Report.aggregate([
+    const user = (await getServerSession(authOptions))?.user;
+
+    if (!user) {
+      throw new Error("Unauthorized user");
+    }
+
+    const eventsById = await Event.aggregate([
+      {
+        $match: { listedBy: new mongoose.Types.ObjectId(user._id) },
+      },
       {
         $lookup: {
           from: "users",
-          localField: "reportedBy",
+          localField: "listedBy",
           foreignField: "_id",
-          as: "reportedByUser",
+          as: "listedBy",
         },
       },
       {
-        $lookup: {
-          from: "ngos",
-          localField: "reportedBy",
-          foreignField: "contactPerson",
-          as: "ngoDetails",
-        },
+        $unwind: "$listedBy",
       },
-      {
-        $unwind: "$reportedByUser",
-      },
-
       {
         $project: {
           _id: 1,
-          title: 1,
-          reportType: 1,
-          details: 1,
-          reportedBy: "$reportedByUser.fullname",
+          name: 1,
+          eventDate: 1,
+          listedBy: "$listedBy.fullname",
           location: 1,
-          createdAt: 1,
-          ngoName: "$ngoDetails.organizationName",
+          locationDesc: 1,
         },
       },
     ]);
 
-    return NextResponse.json(reports, {
+    return NextResponse.json(eventsById, {
       status: 200,
     });
   } catch (error: unknown) {

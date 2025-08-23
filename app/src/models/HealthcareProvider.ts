@@ -7,6 +7,7 @@ interface HeatlhcareProvider {
   associatedOrganization: string;
   yearsOfExperience: number;
   user: mongoose.Schema.Types.ObjectId; // Reference to User model
+  calLink: string;
 }
 
 const healthcareProviderSchema = new Schema<HeatlhcareProvider>(
@@ -41,6 +42,12 @@ const healthcareProviderSchema = new Schema<HeatlhcareProvider>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    calLink: {
+      type: String,
+      required: false,
+      trim: true,
+      default: "",
     },
   },
   { timestamps: true }

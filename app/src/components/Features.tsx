@@ -9,9 +9,9 @@ const features = [
   },
   {
     icon: <MessageCircle className="h-10 w-10 text-green-400" />,
-    title: "Med-o-Chat",
+    title: "Med-o-Consult",
     description:
-      "Engage in real-time conversations with health professionals in native languages, breaking down communication barriers.",
+      "Engage in real-time conversations with health professionals for immediate assistance and advice.",
   },
   {
     icon: <UserStar className="h-10 w-10 text-green-400" />,
