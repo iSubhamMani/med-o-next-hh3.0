@@ -46,7 +46,10 @@ We will upload an image of a medical prescription, and you will extract all rele
 2.  **Structure:** Adhere strictly to the JSON structure provided in the example below. Pay close attention to commas, colons, and brackets.
 3.  **Completeness:** The JSON object must contain all the top-level fields: "title," "error," "errorMessage," and "sections."
 4.  **Content:** Extract and populate the content based on the provided image. If an error occurs, set "error" to true and provide a relevant "errorMessage".
-
+5. **Buy Link Requirement:** For each medicine, generate a "buyLink" field with a valid product search URL from a reputed Indian online pharmacy.  
+   - Preferably use **Apollo Pharmacy**, **Tata 1mg**, **NetMeds**, or **PharmEasy**.  
+   - Example format: 'https://www.1mg.com/search/all?name=Paracetamol'. 
+   - If the section does not require a buy link (e.g., general advice), put null in the field
 ---
 
 ### JSON Structure
@@ -57,6 +60,7 @@ We will upload an image of a medical prescription, and you will extract all rele
     - Each section object must have a **"title"** (e.g., "Medicines").
     - Each section object must have an **"items"** array.
         - Each item object must have a **"medicineName"** field.
+        - Each item object must have a **"buyLink"** field. 
         - Each item object must have a **"details"** array.
             - The details array should contain objects with a **"title"** and **"content"** field.
             - For "Side Effects," the content is an array of strings. For all other titles, the content is a string.
@@ -74,6 +78,7 @@ We will upload an image of a medical prescription, and you will extract all rele
       "items": [
         {
           "medicineName": "Medicine Name 1",
+          "buyLink": "https://www.1mg.com/search/all?name=Paracetamol",
           "details": [
             {
               "title": "Uses",
@@ -91,6 +96,7 @@ We will upload an image of a medical prescription, and you will extract all rele
         },
         {
           "medicineName": "Medicine Name 2",
+          "buyLink": "https://pharmeasy.in/search/all?name=Amoxicillin",
           "details": [
             {
               "title": "Uses",

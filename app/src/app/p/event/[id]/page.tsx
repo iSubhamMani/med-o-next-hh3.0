@@ -99,8 +99,8 @@ export default function EventDetails() {
           <CardHeader className="text-center space-y-2">
             <CardTitle className="text-3xl font-bold">Event Details</CardTitle>
           </CardHeader>
-          <CardContent className="flex gap-6">
-            <div className="w-2/3 space-y-4">
+          <CardContent className="flex flex-col md:flex-row gap-6">
+            <div className="w-full md:w-2/3 space-y-4">
               {/* Map Integration */}
               <div className="space-y-2">
                 <Label>Event Location</Label>
@@ -115,7 +115,7 @@ export default function EventDetails() {
                 )}
               </div>
             </div>
-            <div className="w-1/3 space-y-4">
+            <div className="w-full md:w-1/3 space-y-4">
               <div className="space-y-2 text-neutral-600">
                 <p>
                   Event Name:{" "}

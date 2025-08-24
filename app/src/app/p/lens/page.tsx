@@ -28,6 +28,7 @@ interface AnalysisResult {
   sections: {
     title: string;
     items: {
+      buyLink: string;
       medicineName: string;
       details: {
         title: string;
@@ -411,10 +412,19 @@ const MedLens = () => {
                               className="p-6"
                               key={item.medicineName + itemIndex}
                             >
-                              <CardTitle>
+                              <CardTitle className="flex items-center justify-between">
                                 <p className="text-emerald-500 font-bold">
                                   {item.medicineName}
                                 </p>
+                                {item.buyLink !== null && (
+                                  <a
+                                    target="_blank"
+                                    className="text-emerald-600 underline underline-offset-2"
+                                    href={item.buyLink}
+                                  >
+                                    Buy Link
+                                  </a>
+                                )}
                               </CardTitle>
                               <div className="space-y-4">
                                 {item.details.map((detail, detailIndex) => (
@@ -424,7 +434,7 @@ const MedLens = () => {
                                   >
                                     <p className="text-neutral-500 font-semibold text-lg underline underline-offset-4">
                                       {detail.title}:
-                                    </p>
+                                    </p>{" "}
                                     {Array.isArray(detail.content) ? (
                                       <ul className="list-disc text-neutral-700 ml-6 space-y-1">
                                         {detail.content.map(

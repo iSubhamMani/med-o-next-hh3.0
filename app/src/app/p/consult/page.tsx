@@ -12,6 +12,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CalButton from "@/components/CalPopup";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 interface HealthProviderData {
   _id: string;
@@ -46,6 +48,17 @@ const Consult = () => {
       <h1 className="text-3xl font-bold text-center mb-6">
         Available Health Providers
       </h1>
+      <div className="mb-6">
+        <Link href="/p/dashboard">
+          <Button
+            variant="ghost"
+            className="text-foreground hover:text-primary cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {healthProviders?.map((provider) => (

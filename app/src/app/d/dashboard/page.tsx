@@ -1,14 +1,14 @@
 "use client";
 
 import { DashboardCard } from "@/components/DashboardCard";
-import { EventsList } from "@/components/EventsList";
 import LogoutButton from "@/components/LogoutButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
-import { Calendar, MessageCircle } from "lucide-react";
+import { Calendar } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -20,6 +20,44 @@ interface EventCard {
   listedBy: string;
   locationDesc: string;
 }
+
+interface Event {
+  _id: string;
+  name: string;
+  eventDate: string;
+  listedBy: string;
+  locationDesc: string;
+}
+
+interface EventsListProps {
+  events: Event[];
+}
+
+const EventsList = ({ events }: EventsListProps) => {
+  return (
+    <div className="flex flex-col gap-3">
+      {events.map((event) => (
+        <Link href={"/d/event/" + event._id} key={event._id}>
+          <div className="backdrop-blur-sm bg-glass-hover/50 p-3 rounded-lg border border-glass-border/50 hover:border-primary/30 transition-all">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <h4 className="font-medium text-foreground text-sm">
+                  {event.name}
+                </h4>
+                <p className="text-xs text-muted-foreground mt-1">
+                  📍 {event.locationDesc}
+                </p>
+              </div>
+              <span className="text-xs text-primary font-medium ml-3">
+                {event.eventDate}
+              </span>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+};
 
 const DoctorDashboard = () => {
   const router = useRouter();
@@ -111,8 +149,11 @@ const DoctorDashboard = () => {
               Enter your cal.com link to start accepting consultations.
             </p>
             <div className="space-y-2">
-              <Label className="mt-4 text-neutral-700">Your Cal.com Link</Label>
+              <Label htmlFor="calLink" className="mt-4 text-neutral-700">
+                Your Cal.com Link
+              </Label>
               <Input
+                id="calLink"
                 type="text"
                 placeholder="https://cal.com/your-link"
                 className="mt-4"
