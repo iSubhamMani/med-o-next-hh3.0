@@ -4,16 +4,9 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import CalButton from "@/components/CalPopup";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Briefcase, Mail, Phone, Star } from "lucide-react";
 
 interface HealthProviderData {
   _id: string;
@@ -27,9 +20,7 @@ interface HealthProviderData {
 }
 
 const Consult = () => {
-  const [healthProviders, setHealthProviders] = useState<HealthProviderData[]>(
-    []
-  );
+  const [healthProviders, setHealthProviders] = useState<HealthProviderData[]>([]);
 
   useEffect(() => {
     async function getHealthProviders() {
@@ -44,60 +35,69 @@ const Consult = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 pb-8 pt-4">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Available Health Providers
-      </h1>
-      <div className="mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-800 text-white py-8 px-6">
+      <div className="mb-8">
         <Link href="/p/dashboard">
           <Button
             variant="ghost"
-            className="text-foreground hover:text-primary cursor-pointer"
+            className="mb-4 text-emerald-300 hover:text-emerald-100 cursor-pointer bg-slate-800/50 hover:bg-slate-700/50 rounded-full shadow-lg border border-slate-700"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
         </Link>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200 mb-2 animate-fade-in-down">
+            Available Health Providers
+          </h1>
+          <p className="text-neutral-300 text-sm animate-fade-in-down animation-delay-200">
+            Consult with our expert health providers
+          </p>
+        </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {healthProviders?.map((provider) => (
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        {healthProviders?.map((provider, index) => (
           <Card
             key={provider._id}
-            className="shadow-lg rounded-2xl border border-gray-200 hover:shadow-xl transition"
+            className="rounded-2xl bg-clip-padding backdrop-filter backdrop-blur-xl bg-opacity-20 border border-slate-700 ring-1 ring-slate-700/50 animate-fade-in-up"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">
+              <CardTitle className="text-xl font-semibold text-emerald-400">
                 {provider.fullname}
               </CardTitle>
-              <p className="text-sm text-gray-500">
-                Specialisation:{" "}
-                <span className="text-neutral-700 font-medium">
-                  {provider.specialization}
-                </span>
+              <p className="text-sm text-neutral-300">
+                {provider.specialization}
               </p>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <p>
-                <span className="font-medium">Email:</span> {provider.email}
+            <CardContent className="space-y-3 text-sm text-neutral-300">
+              <p className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-emerald-400" />
+                <span>{provider.email}</span>
               </p>
-              <p>
-                <span className="font-medium">Phone:</span> {provider.phone}
+              <p className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-emerald-400" />
+                <span>{provider.phone}</span>
               </p>
-              <p>
-                <span className="font-medium">Organization:</span>{" "}
-                {provider.associatedOrganization}
+              <p className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-emerald-400" />
+                <span>{provider.associatedOrganization}</span>
               </p>
-              <p>
-                <span className="font-medium">Experience:</span>{" "}
-                {provider.yearsOfExperience} years
+              <p className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-emerald-400" />
+                <span>{provider.yearsOfExperience} years of experience</span>
               </p>
 
-              {provider.calLink ? (
-                <CalButton calLink={provider.calLink} />
-              ) : (
-                <p className="text-red-500 mt-4">Booking link not available</p>
-              )}
+              <div className="pt-4">
+                {provider.calLink ? (
+                  <CalButton calLink={provider.calLink} />
+                ) : (
+                  <p className="text-red-400 mt-4">
+                    Booking link not available
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}

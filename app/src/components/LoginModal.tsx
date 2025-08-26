@@ -57,22 +57,24 @@ const LoginModal = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="font-bold cursor-pointer bg-gradient-to-t from-emerald-900 to-emerald-600 text-white px-6 py-3 rounded-lg shadow-2xl hover:from-emerald-900 hover:to-emerald-700 flex items-center space-x-2 transition">
-          <span>Login</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+        <button className="group relative cursor-pointer text-white px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30 border border-emerald-500/30">
+          <div className="flex items-center space-x-3">
+            <span className="font-semibold tracking-wide">Login</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </div>
         </button>
       </DialogTrigger>
       <DialogContent>

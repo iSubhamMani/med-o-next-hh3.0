@@ -1,5 +1,4 @@
-"use client";
-
+'use client';
 import React from "react";
 import { Button } from "./ui/button";
 import { signOut } from "next-auth/react";
@@ -11,11 +10,11 @@ const LogoutButton = () => {
       onClick={() => {
         signOut({ callbackUrl: "/" });
       }}
-      variant="ghost"
-      size="icon"
-      className="cursor-pointer"
+      size="sm"
+      className="cursor-pointer bg-slate-800/50 hover:bg-slate-700/50 rounded-full shadow-lg border border-slate-700 text-emerald-300 hover:text-emerald-100"
     >
-      <LogOut className="h-5 w-5 text-neutral-600" />
+      <LogOut className="h-5 w-5 mr-2" />
+      Logout
     </Button>
   );
 };
