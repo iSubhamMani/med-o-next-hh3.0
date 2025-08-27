@@ -14,7 +14,7 @@ const MapComponent = dynamic(() => import("@/components/MapComponent"), {
 
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, User, Clock, Loader2 } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
@@ -43,6 +43,7 @@ export default function EventDetails() {
     },
     locationDesc: "",
   });
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const eventId = useParams().id;
@@ -54,6 +55,7 @@ export default function EventDetails() {
   useEffect(() => {
     async function fetchEvent() {
       try {
+        setLoading(true);
         const res = await axios.get("/api/event/" + eventId);
         console.log("Event data:", res.data);
         if (res.data) {
@@ -61,82 +63,147 @@ export default function EventDetails() {
         }
       } catch (error) {
         console.log(error);
+        toast.error("Failed to load event details");
+      } finally {
+        setLoading(false);
       }
     }
     fetchEvent();
-  }, []);
+  }, [eventId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-800 text-white">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-emerald-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold">Loading Event Details...</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    eventData && (
-      <div className="flex flex-col justify-center items-center min-h-screen p-4">
-        <div className="mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-800 text-white">
+      {/* Header */}
+      <header className="p-6 mb-8 rounded-b-2xl bg-clip-padding backdrop-filter backdrop-blur-xl bg-opacity-20 border-b border-slate-700">
+        <div className="container mx-auto">
           <Link href="/d/dashboard">
             <Button
               variant="ghost"
-              className="text-foreground hover:text-primary cursor-pointer"
+              className="text-white hover:text-emerald-300 hover:bg-white/10 cursor-pointer transition-all duration-300 mb-4"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Dashboard
             </Button>
           </Link>
+          
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200 mb-2">
+              Event Details
+            </h1>
+            <p className="text-slate-300">
+              Comprehensive information about your selected event
+            </p>
+          </div>
         </div>
-        <Card className="w-full max-w-7xl shadow-lg rounded-xl">
-          <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-3xl font-bold">Event Details</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col md:flex-row gap-6">
-            <div className="w-full md:w-2/3 space-y-4">
-              {/* Map Integration */}
-              <div className="space-y-2">
-                <Label>Event Location</Label>
-                {isClient && (
-                  <MapComponent
-                    initialPosition={{
-                      lng: eventData.location.coordinates[0],
-                      lat: eventData.location.coordinates[1],
-                    }}
-                    draggable={false}
-                  />
-                )}
-              </div>
-            </div>
-            <div className="w-full md:w-1/3 space-y-4">
-              <div className="space-y-2 text-neutral-600">
-                <p>
-                  Event Name:{" "}
-                  <span className="font-bold text-neutral-900">
-                    {eventData.name}
-                  </span>
-                </p>
-              </div>
-              <div className="space-y-2 text-neutral-600">
-                <p>
-                  Event Date:{" "}
-                  <span className="font-bold text-neutral-900">
-                    {eventData.eventDate}
-                  </span>
-                </p>
-              </div>
-              <div className="space-y-2 text-neutral-600">
-                <p>
-                  Event Location:{" "}
-                  <span className="font-bold text-neutral-900">
-                    {eventData.locationDesc}
-                  </span>
-                </p>
-              </div>
-              <div className="space-y-2 text-neutral-600">
-                <p>
-                  Event Listed By:{" "}
-                  <span className="font-bold text-neutral-900">
-                    {eventData.listedBy}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      </header>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-6 pb-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          
+          {/* Map Section */}
+          <div className="xl:col-span-2">
+            <Card className="bg-slate-800/30 border-slate-700/50 h-full">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <MapPin className="h-6 w-6 text-emerald-400" />
+                  Event Location
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-xl overflow-hidden border border-slate-600/50">
+                  {isClient && eventData.location.coordinates[0] !== 0 && (
+                    <MapComponent
+                      initialPosition={{
+                        lng: eventData.location.coordinates[0],
+                        lat: eventData.location.coordinates[1],
+                      }}
+                      draggable={false}
+                    />
+                  )}
+                  {(!isClient || eventData.location.coordinates[0] === 0) && (
+                    <div className="h-96 bg-slate-700/50 flex items-center justify-center">
+                      <div className="text-center">
+                        <MapPin className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+                        <p className="text-slate-400">Map loading...</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Event Information Panel */}
+          <div className="xl:col-span-1 space-y-6">
+            
+            {/* Event Details Card */}
+            <Card className="bg-slate-800/30 border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-white text-xl">Event Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                
+                {/* Event Name */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="h-5 w-5 text-emerald-400" />
+                    <Label className="text-slate-200 font-medium">Event Name</Label>
+                  </div>
+                  <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600/50">
+                    <p className="text-white font-semibold text-lg">{eventData.name}</p>
+                  </div>
+                </div>
+
+                {/* Event Date */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="h-5 w-5 text-emerald-400" />
+                    <Label className="text-slate-200 font-medium">Event Date</Label>
+                  </div>
+                  <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600/50">
+                    <p className="text-emerald-300 font-semibold">{eventData.eventDate}</p>
+                  </div>
+                </div>
+
+                {/* Location Description */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="h-5 w-5 text-emerald-400" />
+                    <Label className="text-slate-200 font-medium">Location</Label>
+                  </div>
+                  <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600/50">
+                    <p className="text-white">{eventData.locationDesc}</p>
+                  </div>
+                </div>
+
+                {/* Listed By */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="h-5 w-5 text-emerald-400" />
+                    <Label className="text-slate-200 font-medium">Listed By</Label>
+                  </div>
+                  <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600/50">
+                    <p className="text-white">{eventData.listedBy}</p>
+                  </div>
+                </div>
+
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-    )
+    </div>
   );
 }
