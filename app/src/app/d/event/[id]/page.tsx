@@ -101,9 +101,6 @@ export default function EventDetails() {
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200 mb-2">
               Event Details
             </h1>
-            <p className="text-slate-300">
-              Comprehensive information about your selected event
-            </p>
           </div>
         </div>
       </header>
@@ -150,9 +147,7 @@ export default function EventDetails() {
             
             {/* Event Details Card */}
             <Card className="bg-slate-800/30 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="text-white text-xl">Event Information</CardTitle>
-              </CardHeader>
+              
               <CardContent className="space-y-6">
                 
                 {/* Event Name */}
