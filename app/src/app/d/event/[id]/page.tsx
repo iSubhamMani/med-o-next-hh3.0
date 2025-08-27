@@ -16,8 +16,8 @@ import "leaflet/dist/leaflet.css";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Calendar, User, Clock, Loader2 } from "lucide-react";
 import axios from "axios";
-import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface EventData {
   _id: string;

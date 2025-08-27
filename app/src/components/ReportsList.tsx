@@ -21,18 +21,18 @@ export const ReportsList = ({ reports }: ReportsListProps) => {
         <Link href={"/n/report/" + report._id} key={report._id}>
           <div
             key={report._id}
-            className="backdrop-blur-sm bg-glass-hover/50 p-3 rounded-lg border border-glass-border/50 hover:border-primary/30 transition-all"
+            className="backdrop-blur-sm bg-slate-700/50 p-3 rounded-lg border border-slate-600/50 hover:border-emerald-500/30 transition-all"
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h4 className="font-medium text-foreground text-sm">
+                <h4 className="font-medium text-white text-sm">
                   {report.title}
                 </h4>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-slate-300 mt-1">
                   {report.details}
                 </p>
               </div>
-              <span className="text-xs text-primary font-medium ml-3">
+              <span className="text-xs text-emerald-400 font-medium ml-3">
                 {new Date(report.createdAt).toLocaleDateString()}
               </span>
             </div>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Poppins, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
 import Script from "next/script";
+import { Toaster } from "@/components/ui/sonner";
 
 // Option 1: Inter - Clean, modern, highly readable
 const inter = Inter({
@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${selectedFont.className} antialiased`}>
-        <Toaster />
+        <Toaster closeButton richColors  position="top-right"  />
         <script
           type="text/javascript"
           dangerouslySetInnerHTML={{

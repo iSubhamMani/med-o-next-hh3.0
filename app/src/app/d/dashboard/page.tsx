@@ -11,7 +11,7 @@ import { Calendar, Stethoscope, Users, Clock, AlertTriangle, Loader2 } from "luc
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface EventCard {
   _id: string;

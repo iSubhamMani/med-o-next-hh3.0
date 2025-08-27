@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
 
 interface GeneralDetails {
