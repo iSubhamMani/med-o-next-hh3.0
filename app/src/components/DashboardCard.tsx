@@ -21,7 +21,7 @@ const DashboardCard = ({
   return (
     <Link href={link}>
       <Card
-        className="h-full rounded-2xl bg-clip-padding backdrop-filter backdrop-blur-xl bg-opacity-20 border border-slate-700 ring-1 ring-slate-700/50 hover:bg-slate-800/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl animate-fade-in-up"
+        className="h-full rounded-2xl bg-clip-padding backdrop-filter backdrop-blur-xl bg-gray-900/80 border border-slate-700 ring-1 ring-slate-700/50 hover:bg-slate-800/50 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl animate-fade-in-up"
         style={{ animationDelay }}
       >
         <CardHeader>

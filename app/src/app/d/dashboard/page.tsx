@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardCard } from "@/components/DashboardCard";
+import DashboardCard from "@/components/DashboardCard";
 import LogoutButton from "@/components/LogoutButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
@@ -124,12 +124,7 @@ const DoctorDashboard = () => {
       </div>
       <h2 className="text-center text-2xl font-bold mb-6">Welcome!</h2>
       <div className="flex gap-6">
-        <DashboardCard
-          title="Med-o-Track"
-          description="Track health camps & immunization"
-          icon={<Calendar />}
-          className="md:col-span-2 lg:col-span-2 flex-1"
-        >
+        <div className="flex-1 flex-col gap-6">
           <div>
             <h4 className="text-sm font-medium text-foreground mb-3">
               Upcoming Events
@@ -141,7 +136,7 @@ const DoctorDashboard = () => {
               <p>No upcoming events</p>
             )}
           </div>
-        </DashboardCard>
+        </div>
         <Card className="h-max">
           <CardContent>
             <CardTitle>Consult With Patients</CardTitle>

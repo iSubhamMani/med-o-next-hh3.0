@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardCard } from "@/components/DashboardCard";
+import DashboardCard from "@/components/DashboardCard";
 import { ReportsList } from "@/components/ReportsList";
 import { FileText, MapPin, MapPinned } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -71,21 +71,16 @@ const NGODashboard = () => {
         <LogoutButton />
       </div>
       <div className="flex gap-6">
-        <DashboardCard
-          title="Med-o-Report"
-          description="Report health cases & outbreaks"
-          icon={<FileText />}
-          buttonText="Report Now"
-          onButtonClick={() => router.push("/n/report")}
-          className="md:col-span-2 lg:col-span-1"
-        >
-          <div>
-            <h4 className="text-sm font-medium text-foreground mb-3">
-              Recent Reports
-            </h4>
-            <ReportsList reports={recentReports} />
+        {
+          <div className="w-1/3 hidden lg:block">
+            <div>
+              <h4 className="text-lg font-medium text-foreground mb-3">
+                Recent Reports
+              </h4>
+              <ReportsList reports={recentReports} />
+            </div>
           </div>
-        </DashboardCard>
+        }
         <div className="flex flex-col gap-4">
           <Card className="flex-1 h-max">
             <CardHeader>
